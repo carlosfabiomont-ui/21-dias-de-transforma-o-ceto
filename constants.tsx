@@ -20,7 +20,8 @@ import {
   Moon,
   Scale,
   Beef,
-  Wheat
+  Wheat,
+  Dumbbell
 } from 'lucide-react';
 
 // Helper component for content
@@ -34,9 +35,15 @@ export const DAILY_PLAN: DailyGuidance[] = [
     day: 1,
     phase: "Adaptação",
     title: "O Grande Começo",
-    action: "Corte os carboidratos drásticamente (abaixo de 25g). Foque em ovos, carnes e folhas verdes.",
+    action: "Corte total de açúcar, pães e massas. Foco em saciedade.",
     why: "Hoje seu corpo começa a esgotar o estoque de glicogênio (açúcar) no fígado. É o primeiro passo para forçar a mudança de combustível.",
-    icon: Flame
+    icon: Flame,
+    mealPlan: {
+        breakfast: "Ovos mexidos com queijo ou jejum (apenas café preto)",
+        lunch: "Carne (bife/frango) com salada de folhas verdes e azeite",
+        dinner: "Omelete de 2 ovos com espinafre"
+    },
+    exercise: "Caminhada leve de 20 minutos (não force hoje)"
   },
   {
     day: 2,
@@ -44,7 +51,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Combate à Fome",
     action: "Aumente a gordura saudável. Adicione azeite na salada e coma abacate.",
     why: "Seu corpo vai pedir açúcar. Engane a fome com gordura e água. A gordura traz saciedade e sinaliza que há energia disponível.",
-    icon: Utensils
+    icon: Utensils,
+    mealPlan: {
+        breakfast: "Café com óleo de coco ou manteiga (Bulletproof)",
+        lunch: "Sobrecoxa de frango com pele + Brócolis na manteiga",
+        dinner: "Carne moída com abobrinha"
+    },
+    exercise: "Alongamento ou Yoga leve (15 min)"
   },
   {
     day: 3,
@@ -52,7 +65,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Hidratação Crítica",
     action: "Beba 3 litros de água e adicione um pouco mais de sal nas refeições.",
     why: "CRUCIAL: Seus rins estão excretando sódio rapidamente. A falta de sal hoje causa dor de cabeça amanhã. Previna-se.",
-    icon: Droplet
+    icon: Droplet,
+    mealPlan: {
+        breakfast: "Ovos cozidos com azeite e sal",
+        lunch: "Peixe gordo (Salmão/Sardinha) ou Carne Gorda",
+        dinner: "Caldo de ossos ou sopa de legumes low-carb"
+    },
+    exercise: "Descanso ativo (caminhada leve)"
   },
   {
     day: 4,
@@ -60,7 +79,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Barreira da Keto Flu",
     action: "Dia de baixo esforço físico. Se sentir cansaço, use a receita da Água Eletrolítica.",
     why: "Este é frequentemente o dia mais difícil. Seu cérebro está sentindo falta da glicose, mas ainda não tem cetonas suficientes. Vai passar em breve.",
-    icon: ThermometerSun
+    icon: ThermometerSun,
+    mealPlan: {
+        breakfast: "Jejum ou Ovos com Bacon",
+        lunch: "Hambúrguer caseiro (sem pão) com queijo e salada",
+        dinner: "Salada de atum com maionese caseira/azeite"
+    },
+    exercise: "Descanso total (priorize o sono)"
   },
   {
     day: 5,
@@ -68,7 +93,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Virada Metabólica",
     action: "Observe sua energia à tarde. Se não houver queda brusca, comemore.",
     why: "Seu fígado começou a produzir corpos cetônicos em maior quantidade. A 'névoa mental' começa a se dissipar.",
-    icon: Zap
+    icon: Zap,
+    mealPlan: {
+        breakfast: "Smoothie de Abacate (leite de coco + abacate)",
+        lunch: "Bife acebolado com couve refogada",
+        dinner: "Tábua de frios (queijo, salame, azeitonas)"
+    },
+    exercise: "Caminhada moderada (30 min)"
   },
   {
     day: 6,
@@ -76,7 +107,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Controle do Apetite",
     action: "Tente não lanchar entre as refeições principais. Coma apenas se tiver fome real.",
     why: "Seus hormônios da fome (grelina) estão se estabilizando. Você deve notar que não precisa comer a cada 3 horas.",
-    icon: Activity
+    icon: Activity,
+    mealPlan: {
+        breakfast: "Jejum Intermitente (Tente pular o café)",
+        lunch: "Costela ou carne assada com gordura",
+        dinner: "Couve-flor gratinada com queijo e frango"
+    },
+    exercise: "Treino de força leve (flexões, agachamentos em casa)"
   },
   {
     day: 7,
@@ -84,7 +121,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Primeira Vitória",
     action: "Pese-se (opcional) e revise sua semana. Planeje as compras da próxima.",
     why: "Você sobreviveu à semana mais difícil! A perda de peso inicial é principalmente água (desinchaço), o que é ótimo para inflamação.",
-    icon: Award
+    icon: Award,
+    mealPlan: {
+        breakfast: "Panqueca Low Carb (ovo + farinha de amêndoas/coco)",
+        lunch: "Churrasco (carnes variadas, sem pão de alho)",
+        dinner: "Restos do almoço ou salada leve"
+    },
+    exercise: "Caminhada ao ar livre ou Lazer"
   },
 
   // FASE 2: CONSOLIDAÇÃO (Dias 8-14)
@@ -94,15 +137,27 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Clareza Mental",
     action: "Aproveite o foco extra para tarefas difíceis no trabalho ou estudo.",
     why: "Seu cérebro adora cetonas! Diferente do açúcar que oscila, as cetonas fornecem energia constante e limpa para os neurônios.",
-    icon: BrainCircuit
+    icon: BrainCircuit,
+    mealPlan: {
+        breakfast: "Café preto (Jejum)",
+        lunch: "Salada Caesar (sem croutons) com frango extra",
+        dinner: "Ovos mexidos com cogumelos"
+    },
+    exercise: "Treino HIIT curto (15 min)"
   },
   {
     day: 9,
     phase: "Consolidação",
     title: "Sono Reparador",
-    action: "Evite comer muito tarde. Observe a qualidade do seu sono.",
+    action: "Evite comer muito tarde (2h antes de dormir). Observe a qualidade do sono.",
     why: "O sono profundo ajuda a regular o cortisol (estresse). Cortisol alto atrapalha a queima de gordura. Dormir bem = Emagrecer.",
-    icon: Moon
+    icon: Moon,
+    mealPlan: {
+        breakfast: "Ovos cozidos",
+        lunch: "Lombo de porco com repolho refogado",
+        dinner: "Sopa de abóbora (pouca quantidade) com frango"
+    },
+    exercise: "Caminhada relaxante"
   },
   {
     day: 10,
@@ -110,7 +165,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Mudança de Paladar",
     action: "Coma um pedaço de chocolate 85% ou morangos. Note como parecem mais doces.",
     why: "Sem a sobrecarga de açúcar, suas papilas gustativas se recuperaram. Você começa a sentir o sabor real dos alimentos.",
-    icon: UtensilsIcon
+    icon: UtensilsIcon,
+    mealPlan: {
+        breakfast: "Iogurte natural integral (pouco) ou Jejum",
+        lunch: "Carne moída com purê de couve-flor",
+        dinner: "Peixe grelhado com espinafre"
+    },
+    exercise: "Treino de força (Musculação ou Calistenia)"
   },
   {
     day: 11,
@@ -118,15 +179,27 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Energia Constante",
     action: "Monitore sua energia pós-almoço. O sono da tarde sumiu?",
     why: "Sem picos de insulina, não há hipoglicemia reativa (o 'crash' pós-almoço). Sua energia se torna uma linha reta.",
-    icon: Battery
+    icon: Battery,
+    mealPlan: {
+        breakfast: "Omelete de queijo e presunto",
+        lunch: "Frango assado com pele + Salada de rúcula",
+        dinner: "Abacate com sal e limão"
+    },
+    exercise: "Cardio moderado (Corrida ou Bike)"
   },
   {
     day: 12,
     phase: "Consolidação",
     title: "Movimento",
-    action: "Faça uma caminhada longa ou treino moderado.",
-    why: "Seus músculos agora estão mais eficientes em usar gordura corporal como combustível durante o exercício.",
-    icon: Activity
+    action: "Aumente a intensidade do treino hoje.",
+    why: "Seus músculos agora estão mais eficientes em usar gordura corporal como combustível durante o exercício (Keto-adaptado).",
+    icon: Activity,
+    mealPlan: {
+        breakfast: "Jejum Intermitente",
+        lunch: "Bife de Alcatra com brócolis",
+        dinner: "Pizza Low Carb (base de berinjela ou frango)"
+    },
+    exercise: "Treino Intenso (45 min)"
   },
   {
     day: 13,
@@ -134,7 +207,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Roupas e Medidas",
     action: "Esqueça a balança. Prove aquela roupa que estava apertada.",
     why: "Muitas vezes perdemos volume (gordura visceral) antes de perder peso na balança. A composição corporal está mudando.",
-    icon: Scale
+    icon: Scale,
+    mealPlan: {
+        breakfast: "Ovos com bacon",
+        lunch: "Estrogonofe (creme de leite fresco, sem catchup)",
+        dinner: "Salada de folhas com queijo feta/branco"
+    },
+    exercise: "Alongamento profundo"
   },
   {
     day: 14,
@@ -142,7 +221,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Teste Social",
     action: "Se for sair, planeje antes: Olhe o cardápio ou coma algo antes.",
     why: "A preparação vence a tentação. Manter-se fiel em eventos sociais fortalece sua autoconfiança no novo estilo de vida.",
-    icon: ShieldAlert
+    icon: ShieldAlert,
+    mealPlan: {
+        breakfast: "Panqueca de coco",
+        lunch: "Feijoada sem carnes processadas (só as nobres) e couve",
+        dinner: "Jantar livre (dentro da dieta: Queijos e Vinhos secos)"
+    },
+    exercise: "Dia livre / Lazer"
   },
 
   // FASE 3: OTIMIZAÇÃO (Dias 15-21)
@@ -150,9 +235,15 @@ export const DAILY_PLAN: DailyGuidance[] = [
     day: 15,
     phase: "Otimização",
     title: "Máquina de Queimar Gordura",
-    action: "Experimente atrasar o café da manhã em 2 horas (Jejum Intermitente leve).",
+    action: "Experimente atrasar o almoço (Jejum de 16h).",
     why: "Seu corpo está 'keto-adaptado'. O jejum agora é fácil e potencializa a autofagia (renovação celular) e queima de gordura.",
-    icon: Flame
+    icon: Flame,
+    mealPlan: {
+        breakfast: "Jejum (apenas água/café)",
+        lunch: "Almoço reforçado: Carne gorda + vegetais",
+        dinner: "Ovos cozidos (leve)"
+    },
+    exercise: "Caminhada em jejum (opcional)"
   },
   {
     day: 16,
@@ -160,7 +251,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Foco Produtivo",
     action: "Use sua energia mental para organizar sua rotina futura.",
     why: "Neste estágio, muitos relatam o pico de performance mental. É o estado de fluxo facilitado pela cetose.",
-    icon: Zap
+    icon: Zap,
+    mealPlan: {
+        breakfast: "Café Bulletproof",
+        lunch: "Salmão ou Atum com maionese caseira",
+        dinner: "Abobrinha recheada com carne moída"
+    },
+    exercise: "Treino de força"
   },
   {
     day: 17,
@@ -168,7 +265,13 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Autoestima",
     action: "Tire uma foto de progresso ou compare com a do Dia 1.",
     why: "A redução da inflamação sistêmica melhora a pele e diminui a retenção de líquidos no rosto.",
-    icon: TrendingUp
+    icon: TrendingUp,
+    mealPlan: {
+        breakfast: "Ovos mexidos",
+        lunch: "Frango ao curry (leite de coco)",
+        dinner: "Sopa de legumes verdes"
+    },
+    exercise: "Cardio ou Esporte coletivo"
   },
   {
     day: 18,
@@ -176,15 +279,27 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Hábito Formado",
     action: "Perceba como escolher alimentos low-carb ficou automático.",
     why: "A neurociência diz que a repetição cria caminhos neurais. O que era sacrifício no Dia 1, hoje é sua nova normalidade.",
-    icon: BrainCircuit
+    icon: BrainCircuit,
+    mealPlan: {
+        breakfast: "Jejum",
+        lunch: "Costela assada",
+        dinner: "Mix de castanhas e queijo (lanche leve)"
+    },
+    exercise: "Yoga ou Mobilidade"
   },
   {
     day: 19,
     phase: "Otimização",
     title: "Quebra de Platô",
-    action: "Se o peso estagnou, corte laticínios ou castanhas hoje.",
+    action: "Corte laticínios ou castanhas hoje se o peso estagnou.",
     why: "Pequenos ajustes finos agora trazem grandes resultados. Alimentos densos em calorias às vezes impedem a queima final.",
-    icon: ListChecks
+    icon: ListChecks,
+    mealPlan: {
+        breakfast: "Ovos e Bacon (Sem queijo)",
+        lunch: "Bife e Salada (apenas azeite)",
+        dinner: "Sashimi ou Peixe grelhado"
+    },
+    exercise: "HIIT Intenso"
   },
   {
     day: 20,
@@ -192,15 +307,27 @@ export const DAILY_PLAN: DailyGuidance[] = [
     title: "Confiança Total",
     action: "Reflita: Você controlou sua alimentação, e não o contrário.",
     why: "O maior ganho da cetogênica não é só físico, é o controle emocional sobre a comida e a libertação da dependência do açúcar.",
-    icon: Award
+    icon: Award,
+    mealPlan: {
+        breakfast: "Sua escolha favorita Low Carb",
+        lunch: "Sua carne favorita com vegetais",
+        dinner: "Jantar leve"
+    },
+    exercise: "Treino favorito"
   },
   {
     day: 21,
     phase: "Otimização",
     title: "Transformação Completa",
-    action: "Celebre! Leia a seção 'Pós-21 Dias' no Guia para decidir seu futuro.",
+    action: "Celebre! Leia a seção 'Pós-21 Dias' no Guia.",
     why: "Você completou o ciclo de adaptação metabólica. Seu corpo agora é flexível. Você tem as ferramentas para a vida toda.",
-    icon: CalendarCheck
+    icon: CalendarCheck,
+    mealPlan: {
+        breakfast: "Café da manhã especial (waffle low carb ou ovos gourmet)",
+        lunch: "Almoço de celebração",
+        dinner: "Planejamento da manutenção"
+    },
+    exercise: "Atividade de lazer ativa"
   }
 ];
 
@@ -286,6 +413,15 @@ export const RECIPES: Recipe[] = [
       "Adicionar sementes de abóbora ou girassol"
     ],
     tags: ["Snack", "On-the-go"]
+  },
+  {
+    id: 7,
+    title: "Café Bulletproof",
+    category: "Café da Manhã",
+    prepTime: "5 min",
+    ingredients: ["200ml café quente", "1 colher de sopa de manteiga sem sal", "1 colher de sopa de óleo de coco ou MCT"],
+    variations: ["Adicionar canela", "Adicionar cacau em pó"],
+    tags: ["Energia", "Jejum"]
   }
 ];
 

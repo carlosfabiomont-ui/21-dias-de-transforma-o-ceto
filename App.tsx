@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ViewState, DailyLog, UserSettings, ShoppingItem } from './types';
+import { ViewState, DailyLog, UserSettings, ShoppingItem, DailyGuidance } from './types';
 import { GUIDE_CONTENT, RECIPES, SUBSTITUTIONS, DAILY_PLAN } from './constants';
 import { 
   LayoutDashboard, 
@@ -34,7 +34,10 @@ import {
   LogOut,
   HelpCircle,
   FileText,
-  RotateCcw
+  RotateCcw,
+  Coffee,
+  Dumbbell,
+  MousePointerClick
 } from 'lucide-react';
 
 // --- CONSTANTS FOR STORAGE ---
@@ -58,7 +61,7 @@ const Toast = ({ message, show, onClose }: { message: string, show: boolean, onC
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-keto-dark dark:bg-keto-primary text-white px-6 py-3 rounded-full shadow-xl z-50 animate-bounce flex items-center gap-2">
+    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-keto-dark dark:bg-keto-primary text-white px-6 py-3 rounded-full shadow-xl z-[60] animate-bounce flex items-center gap-2">
       <CheckCircle2 className="w-5 h-5" />
       <span className="font-bold text-sm">{message}</span>
     </div>
@@ -108,8 +111,9 @@ const Confetti = ({ active }: { active: boolean }) => {
 // --- HELPER COMPONENT: SIMPLE CHART ---
 const SimpleChart = ({ data, dataKey, color, label }: { data: DailyLog[], dataKey: keyof DailyLog, color: string, label: string }) => {
     if (data.length < 2) return (
-        <div className="h-40 flex items-center justify-center bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-300 dark:border-white/10 text-gray-400 text-sm p-4 text-center">
-            Adicione pelo menos 2 registros para ver o gráfico de {label}.
+        <div className="h-40 flex flex-col items-center justify-center bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-300 dark:border-white/10 text-gray-400 text-sm p-4 text-center">
+            <BarChart2 className="w-8 h-8 mb-2 opacity-50"/>
+            <p>Registre pelo menos 2 dias para ver o gráfico de {label}.</p>
         </div>
     );
 
@@ -212,6 +216,111 @@ const LegalModal = ({ isOpen, onClose, type }: { isOpen: boolean, onClose: () =>
 };
 
 
+// --- DAY DETAIL MODAL ---
+const DayDetailModal = ({ dayData, isOpen, onClose, isCompleted, onToggle }: { dayData: DailyGuidance, isOpen: boolean, onClose: () => void, isCompleted: boolean, onToggle: (day: number) => void }) => {
+  if (!isOpen) return null;
+  const Icon = dayData.icon;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+        <div className="bg-white dark:bg-[#1a100a] w-full max-w-lg h-[95vh] sm:h-auto sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="bg-keto-primary p-6 text-white relative shrink-0">
+                 <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition">
+                     <X className="w-6 h-6"/>
+                 </button>
+                 <div className="flex items-center gap-3 mb-2 opacity-90">
+                     <span className="text-xs font-bold uppercase tracking-wider bg-black/20 px-2 py-1 rounded">Dia {dayData.day}</span>
+                     <span className="text-xs font-bold uppercase tracking-wider">{dayData.phase}</span>
+                 </div>
+                 <h2 className="text-2xl font-serif font-bold flex items-center gap-2 pr-8 leading-tight">
+                    <Icon className="w-6 h-6 shrink-0"/> {dayData.title}
+                 </h2>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                
+                {/* Main Action */}
+                <div>
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2 text-lg">
+                        <CheckCircle2 className="w-6 h-6 text-keto-primary"/> Missão de Hoje
+                    </h3>
+                    <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border-l-4 border-keto-primary">
+                        <p className="text-gray-800 dark:text-gray-200 font-medium text-lg leading-relaxed">
+                            {dayData.action}
+                        </p>
+                    </div>
+                </div>
+
+                {/* The "Why" Section */}
+                <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                     <h4 className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200 mb-2 text-sm uppercase tracking-wide">
+                        <Info className="w-4 h-4"/> Por que isso funciona?
+                     </h4>
+                     <p className="text-sm text-blue-800 dark:text-blue-100 leading-relaxed">
+                        {dayData.why}
+                     </p>
+                </div>
+
+                {/* Meal Plan */}
+                <div className="space-y-3">
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <Utensils className="w-5 h-5 text-keto-primary"/> Cardápio Sugerido
+                    </h3>
+                    <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-xl space-y-4 border border-gray-100 dark:border-white/5 shadow-sm">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1"><Coffee className="w-3 h-3"/> Café da Manhã</span>
+                            <span className="text-base text-gray-800 dark:text-gray-200 font-medium">{dayData.mealPlan.breakfast}</span>
+                        </div>
+                        <div className="h-px bg-gray-200 dark:bg-white/10 w-full"/>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1"><Utensils className="w-3 h-3"/> Almoço</span>
+                            <span className="text-base text-gray-800 dark:text-gray-200 font-medium">{dayData.mealPlan.lunch}</span>
+                        </div>
+                        <div className="h-px bg-gray-200 dark:bg-white/10 w-full"/>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1"><Moon className="w-3 h-3"/> Jantar</span>
+                            <span className="text-base text-gray-800 dark:text-gray-200 font-medium">{dayData.mealPlan.dinner}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Exercise */}
+                <div className="bg-white dark:bg-white/5 p-4 rounded-xl border border-gray-200 dark:border-white/10">
+                     <h4 className="flex items-center gap-2 font-bold text-gray-700 dark:text-gray-300 mb-1 text-sm uppercase">
+                        <Dumbbell className="w-4 h-4"/> Movimento
+                     </h4>
+                     <p className="font-medium text-gray-900 dark:text-white">
+                        {dayData.exercise}
+                     </p>
+                </div>
+
+            </div>
+
+            {/* Footer Action */}
+            <div className="p-4 border-t border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-black/20 shrink-0 pb-safe">
+                <button 
+                    onClick={() => { onToggle(dayData.day); onClose(); }}
+                    className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 ${isCompleted ? 'bg-green-500 text-white' : 'bg-keto-primary text-white hover:bg-keto-accent'}`}
+                >
+                    {isCompleted ? (
+                        <>
+                            <Check className="w-6 h-6"/> Dia Concluído!
+                        </>
+                    ) : (
+                        <>
+                            <CheckCircle2 className="w-6 h-6"/> Concluir Missão de Hoje
+                        </>
+                    )}
+                </button>
+            </div>
+        </div>
+    </div>
+  );
+};
+
+
 // --- ONBOARDING COMPONENTS ---
 const OnboardingQuiz = ({ onComplete }: { onComplete: (data: Partial<UserSettings>) => void }) => {
   const [step, setStep] = useState(0);
@@ -299,7 +408,7 @@ const OnboardingQuiz = ({ onComplete }: { onComplete: (data: Partial<UserSetting
 
         <div className="mt-4 mb-8">
            <h1 className="text-2xl font-serif font-bold text-keto-dark dark:text-keto-cream mb-2">
-             {step === 0 && "Vamos começar sua transformação"}
+             {step === 0 && "Vamos começar"}
              {step === 1 && "Seus dados corporais"}
              {step === 2 && "Nível de atividade"}
              {step === 3 && "Hábitos alimentares"}
@@ -419,12 +528,32 @@ const OnboardingQuiz = ({ onComplete }: { onComplete: (data: Partial<UserSetting
 };
 
 
-// 1. Navigation Sidebar/Drawer
+// 1. Navigation Sidebar (Desktop) & Bottom Nav (Mobile)
+
+const MobileBottomNav = ({ currentView, setView }: { currentView: ViewState, setView: (v: ViewState) => void }) => {
+    const NavButton = ({ view, icon: Icon, label }: { view: ViewState, icon: any, label: string }) => (
+        <button 
+            onClick={() => setView(view)}
+            className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all w-full ${currentView === view ? 'text-keto-primary bg-keto-primary/10' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
+        >
+            <Icon className={`w-6 h-6 mb-1 ${currentView === view ? 'fill-current' : ''}`} strokeWidth={currentView === view ? 2.5 : 2} />
+            <span className="text-[10px] font-bold tracking-wide">{label}</span>
+        </button>
+    );
+
+    return (
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-keto-darker border-t border-gray-200 dark:border-white/10 px-4 py-2 pb-safe flex justify-between items-center z-40 lg:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <NavButton view={ViewState.DASHBOARD} icon={LayoutDashboard} label="Hoje" />
+            <NavButton view={ViewState.RECIPES} icon={Utensils} label="Comer" />
+            <NavButton view={ViewState.TRACKER} icon={Activity} label="Diário" />
+            <NavButton view={ViewState.GUIDE} icon={BookOpen} label="Guia" />
+        </div>
+    );
+};
+
 const Sidebar = ({ 
   currentView, 
   setView, 
-  isOpen, 
-  setIsOpen,
   isDarkMode,
   toggleTheme,
   resetApp,
@@ -432,8 +561,6 @@ const Sidebar = ({
 }: { 
   currentView: ViewState; 
   setView: (v: ViewState) => void; 
-  isOpen: boolean; 
-  setIsOpen: (v: boolean) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
   resetApp: () => void;
@@ -441,7 +568,7 @@ const Sidebar = ({
 }) => {
   const NavItem = ({ view, icon: Icon, label }: { view: ViewState, icon: any, label: string }) => (
     <button
-      onClick={() => { setView(view); setIsOpen(false); }}
+      onClick={() => setView(view)}
       className={`w-full flex items-center gap-3 px-4 py-4 rounded-lg transition-all ${
         currentView === view 
           ? 'bg-keto-primary text-white shadow-md shadow-keto-primary/20' 
@@ -454,41 +581,24 @@ const Sidebar = ({
   );
 
   return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-      
-      {/* Sidebar Content */}
       <div className={`
-        fixed top-0 left-0 h-full w-64 bg-keto-cream dark:bg-[#1a100a] border-r border-gray-200 dark:border-white/10 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl flex flex-col
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        hidden lg:flex fixed top-0 left-0 h-full w-64 bg-keto-cream dark:bg-[#1a100a] border-r border-gray-200 dark:border-white/10 z-50 flex-col shadow-2xl
       `}>
-        <div className="p-6 flex justify-between items-center border-b border-gray-200 dark:border-white/10">
-          <div className="flex items-center gap-3">
+        <div className="p-8 flex items-center gap-3">
             <div className="bg-gradient-to-br from-keto-primary to-keto-accent p-2 rounded-lg shadow-lg shadow-keto-primary/30">
                 <Flame className="w-6 h-6 text-white" />
             </div>
-            <h1 className="font-serif text-lg font-bold text-keto-dark dark:text-keto-cream leading-tight">Keto<br/>Carnívora</h1>
-          </div>
-          <button onClick={() => setIsOpen(false)} className="lg:hidden text-gray-500 dark:text-gray-400">
-            <X className="w-6 h-6" />
-          </button>
+            <h1 className="font-serif text-xl font-bold text-keto-dark dark:text-keto-cream leading-tight">Keto<br/>Carnívora</h1>
         </div>
         
-        <nav className="px-4 py-6 space-y-2 flex-1">
-          <NavItem view={ViewState.DASHBOARD} icon={LayoutDashboard} label="Meu Progresso" />
-          <NavItem view={ViewState.GUIDE} icon={BookOpen} label="Guia & Ciência" />
-          <NavItem view={ViewState.RECIPES} icon={Utensils} label="Receitas & Plano" />
-          <NavItem view={ViewState.TRACKER} icon={Activity} label="Ferramentas" />
+        <nav className="px-4 py-4 space-y-2 flex-1">
+          <NavItem view={ViewState.DASHBOARD} icon={LayoutDashboard} label="Hoje" />
+          <NavItem view={ViewState.RECIPES} icon={Utensils} label="Receitas" />
+          <NavItem view={ViewState.TRACKER} icon={Activity} label="Meu Diário" />
+          <NavItem view={ViewState.GUIDE} icon={BookOpen} label="Manual Keto" />
         </nav>
 
         <div className="px-4 space-y-2 mb-4">
-             {/* Support Button (Hotmart requirement) */}
              <button 
                 onClick={() => window.open('mailto:suporte@ketocarnivora.com')}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
@@ -519,7 +629,6 @@ const Sidebar = ({
              </button>
         </div>
       </div>
-    </>
   );
 };
 
@@ -531,64 +640,122 @@ const Dashboard = ({ settings, completedDays, toggleDay }: { settings: UserSetti
     const todayGuidance = DAILY_PLAN.find(d => d.day === currentFocusDayNum)!;
     const TodayIcon = todayGuidance.icon;
     const isTodayDone = completedDays.includes(currentFocusDayNum);
-    const [expandedDay, setExpandedDay] = useState<number | null>(null);
-    const toggleExpand = (day: number) => { if (expandedDay === day) { setExpandedDay(null); } else { setExpandedDay(day); } }
+    
+    // Modal State
+    const [selectedDay, setSelectedDay] = useState<DailyGuidance | null>(null);
 
     return (
-        <div className="space-y-8 animate-fade-in">
-           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-            <h2 className="text-3xl font-serif font-bold text-keto-dark dark:text-keto-cream">Olá, {settings.name}</h2>
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mt-1">
-                <Calendar className="w-4 h-4 text-keto-primary"/>
-                <span>{daysDoneCount} de {totalDays} dias concluídos</span>
-            </div>
-            </div>
-           </header>
-           {/* Progress Bar */}
-           <div>
-                <div className="w-full bg-gray-200 dark:bg-stone-800 rounded-full h-3">
-                    <div className="bg-gradient-to-r from-keto-primary to-keto-accent h-3 rounded-full" style={{ width: `${progress}%` }}></div>
-                </div>
-           </div>
+        <div className="space-y-8 animate-fade-in pb-24 lg:pb-10">
+           {selectedDay && (
+             <DayDetailModal 
+                dayData={selectedDay} 
+                isOpen={!!selectedDay} 
+                onClose={() => setSelectedDay(null)} 
+                isCompleted={completedDays.includes(selectedDay.day)}
+                onToggle={toggleDay}
+             />
+           )}
 
-           {!completedDays.includes(21) && (
-             <div className="bg-white dark:bg-keto-dark rounded-3xl shadow-xl overflow-hidden ring-4 ring-keto-light/30 dark:ring-keto-primary/10">
-                <div className="bg-keto-dark dark:bg-black text-white p-6 relative">
-                     <div className="flex items-start gap-4 relative z-10">
-                        <TodayIcon className="w-8 h-8 text-keto-primary" />
-                        <div>
-                            <span className="bg-keto-primary text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">{todayGuidance.phase}</span>
-                            <h3 className="text-2xl font-serif font-bold text-white mt-1">{todayGuidance.title}</h3>
-                        </div>
-                     </div>
+           <header className="flex flex-col gap-2">
+                <div className="flex justify-between items-end">
+                    <h2 className="text-3xl font-serif font-bold text-keto-dark dark:text-keto-cream">Olá, {settings.name}</h2>
+                    <div className="text-right">
+                        <span className="text-3xl font-bold text-keto-primary">{daysDoneCount}</span>
+                        <span className="text-sm text-gray-400 font-bold uppercase">/21 dias</span>
+                    </div>
                 </div>
-                <div className="p-6">
-                    <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">{todayGuidance.action}</p>
-                    <button 
-                        onClick={() => toggleDay(todayGuidance.day)}
-                        className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 ${isTodayDone ? 'bg-green-100 text-green-800' : 'bg-keto-primary text-white'}`}
-                    >
-                        {isTodayDone ? 'Concluído' : 'Marcar como Feito'}
-                    </button>
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 dark:bg-stone-800 rounded-full h-3">
+                    <div className="bg-gradient-to-r from-keto-primary to-keto-accent h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${progress}%` }}></div>
+                </div>
+                {daysDoneCount === 0 && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        💪 Toque no card abaixo para começar sua primeira missão!
+                    </p>
+                )}
+           </header>
+
+           {/* TODAY'S MISSION CARD */}
+           {!completedDays.includes(21) && (
+             <div className="relative group">
+                 {/* Pulsing effect behind the card if it's not done */}
+                {!isTodayDone && <div className="absolute -inset-1 bg-keto-primary/20 rounded-[2rem] blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>}
+                
+                <div className="bg-white dark:bg-keto-dark rounded-3xl shadow-xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 cursor-pointer transition-transform hover:scale-[1.01] relative" onClick={() => setSelectedDay(todayGuidance)}>
+                    <div className="bg-keto-dark dark:bg-black text-white p-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-4">
+                            <TodayIcon className="w-32 h-32" />
+                        </div>
+                        <div className="flex items-start gap-4 relative z-10">
+                            <div className="bg-keto-primary/20 p-3 rounded-xl backdrop-blur-sm border border-white/10">
+                                <TodayIcon className="w-8 h-8 text-keto-primary" />
+                            </div>
+                            <div>
+                                <span className="bg-keto-primary text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Fase: {todayGuidance.phase}</span>
+                                <h3 className="text-2xl font-serif font-bold text-white mt-1 leading-tight">Dia {todayGuidance.day}: {todayGuidance.title}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <div className="mb-6">
+                            <h4 className="font-bold text-gray-400 text-xs uppercase mb-2 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Sua Missão Hoje</h4>
+                            <p className="text-lg text-gray-800 dark:text-gray-200 leading-snug font-medium">{todayGuidance.action}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 mb-6">
+                            <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
+                                <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">Almoço</div>
+                                <div className="text-sm font-semibold dark:text-gray-200 line-clamp-2 leading-tight">{todayGuidance.mealPlan.lunch}</div>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
+                                <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">Treino</div>
+                                <div className="text-sm font-semibold dark:text-gray-200 line-clamp-2 leading-tight">{todayGuidance.exercise}</div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setSelectedDay(todayGuidance); }}
+                            className="w-full py-4 bg-keto-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-keto-accent transition-colors shadow-lg shadow-keto-primary/20 animate-bounce-short"
+                        >
+                            <MousePointerClick className="w-5 h-5"/> Toque para Ver a Missão
+                        </button>
+                    </div>
                 </div>
              </div>
            )}
 
-           {/* Full List Logic */}
-           <div className="bg-white dark:bg-keto-dark rounded-2xl border border-gray-200 dark:border-white/5 divide-y divide-gray-100 dark:divide-white/5">
-                {DAILY_PLAN.map((day) => (
-                    <div key={day.day} className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer" onClick={() => toggleExpand(day.day)}>
-                         <button onClick={(e) => { e.stopPropagation(); toggleDay(day.day); }} className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${completedDays.includes(day.day) ? 'bg-keto-primary border-keto-primary text-white' : 'border-gray-300'}`}>
-                            <Check className="w-3 h-3" />
-                         </button>
-                         <div className="flex-1">
-                             <div className="text-xs font-bold text-keto-primary">DIA {day.day}</div>
-                             <div className="font-bold text-gray-900 dark:text-gray-100">{day.title}</div>
-                         </div>
-                         <ChevronDown className={`w-4 h-4 text-gray-400 ${expandedDay === day.day ? 'rotate-180' : ''}`} />
-                    </div>
-                ))}
+           {/* Full Journey List */}
+           <div>
+               <h3 className="font-serif font-bold text-xl text-keto-dark dark:text-keto-cream mb-4 flex items-center gap-2">
+                   <BookOpen className="w-5 h-5"/> Sua Jornada
+               </h3>
+               <div className="bg-white dark:bg-keto-dark rounded-2xl border border-gray-200 dark:border-white/5 divide-y divide-gray-100 dark:divide-white/5 shadow-sm">
+                    {DAILY_PLAN.map((day) => {
+                        const isDone = completedDays.includes(day.day);
+                        const isLocked = day.day > currentFocusDayNum && !isDone;
+                        const isCurrent = day.day === currentFocusDayNum;
+                        
+                        return (
+                            <div 
+                                key={day.day} 
+                                className={`p-4 flex items-center gap-4 transition-colors ${isLocked ? 'opacity-50 grayscale bg-gray-50 dark:bg-white/5' : isCurrent ? 'bg-keto-light/30 dark:bg-keto-primary/10 ring-1 ring-inset ring-keto-primary/20' : 'hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer bg-white dark:bg-transparent'}`} 
+                                onClick={() => !isLocked && setSelectedDay(day)}
+                            >
+                                <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isDone ? 'bg-keto-primary border-keto-primary text-white' : isCurrent ? 'border-keto-primary text-keto-primary animate-pulse' : 'border-gray-300 dark:border-white/20 text-gray-400'}`}>
+                                    {isDone ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{day.day}</span>}
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-center mb-0.5">
+                                        <div className={`text-[10px] font-bold uppercase ${isCurrent ? 'text-keto-primary' : 'text-gray-400'}`}>{day.phase}</div>
+                                        {isLocked && <Lock className="w-3 h-3 text-gray-400"/>}
+                                    </div>
+                                    <div className={`font-bold ${isCurrent ? 'text-keto-primary dark:text-keto-accent' : 'text-gray-900 dark:text-gray-100'}`}>{day.title}</div>
+                                </div>
+                                {!isLocked && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                            </div>
+                        );
+                    })}
+               </div>
            </div>
         </div>
     );
@@ -598,34 +765,62 @@ const RecipesView = ({ shoppingList, addToShoppingList, toggleShoppingItem, clea
     const [filter, setFilter] = useState('Todos');
     const filtered = filter === 'Todos' ? RECIPES : RECIPES.filter(r => r.category === filter);
     return (
-        <div className="space-y-6">
-             {shoppingList.length > 0 && (
-                 <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
-                    <div className="flex justify-between mb-2">
-                        <h3 className="font-bold text-amber-900 dark:text-amber-200 flex gap-2"><ShoppingBasket className="w-4 h-4"/> Lista ({shoppingList.length})</h3>
-                        <button onClick={clearShoppingList} className="text-xs text-red-500"><Trash2 className="w-3 h-3"/></button>
+        <div className="space-y-6 pb-24 lg:pb-10">
+             <div className="bg-white dark:bg-keto-dark p-6 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-serif font-bold text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                        <ShoppingBasket className="w-5 h-5 text-keto-primary"/> Lista de Compras
+                    </h3>
+                    {shoppingList.length > 0 && (
+                        <button onClick={clearShoppingList} className="text-xs text-red-500 font-bold flex items-center gap-1 hover:bg-red-50 dark:hover:bg-red-900/20 px-2 py-1 rounded">
+                            <Trash2 className="w-3 h-3"/> Limpar
+                        </button>
+                    )}
+                </div>
+                
+                {shoppingList.length === 0 ? (
+                    <div className="text-center py-6 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl">
+                        <ShoppingBasket className="w-8 h-8 text-gray-300 mx-auto mb-2"/>
+                        <p className="text-sm text-gray-500">Sua lista está vazia.</p>
+                        <p className="text-xs text-gray-400">Adicione ingredientes das receitas abaixo.</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                ) : (
+                    <div className="space-y-2">
                         {shoppingList.map((i: any) => (
-                            <div key={i.id} onClick={() => toggleShoppingItem(i.id)} className={`text-sm cursor-pointer ${i.checked ? 'line-through text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}>{i.name}</div>
+                            <div key={i.id} onClick={() => toggleShoppingItem(i.id)} className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10">
+                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center ${i.checked ? 'bg-keto-primary border-keto-primary text-white' : 'border-gray-300 dark:border-gray-600'}`}>
+                                    {i.checked && <Check className="w-3 h-3"/>}
+                                </div>
+                                <span className={`text-sm font-medium ${i.checked ? 'line-through text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}>{i.name}</span>
+                            </div>
                         ))}
                     </div>
-                 </div>
-             )}
-             <div className="flex gap-2 overflow-x-auto pb-2">
-                 {['Todos', 'Café da Manhã', 'Almoço', 'Jantar'].map(f => (
-                     <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-sm font-bold ${filter === f ? 'bg-keto-primary text-white' : 'bg-gray-100 dark:bg-white/10'}`}>{f}</button>
+                )}
+             </div>
+
+             <h3 className="font-serif font-bold text-xl text-gray-900 dark:text-white mt-8 mb-4">Receitas Fáceis</h3>
+             <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
+                 {['Todos', 'Café da Manhã', 'Almoço', 'Jantar', 'Lanche'].map(f => (
+                     <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${filter === f ? 'bg-keto-primary text-white shadow-lg shadow-keto-primary/20' : 'bg-white dark:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-transparent'}`}>{f}</button>
                  ))}
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {filtered.map(r => (
-                     <div key={r.id} className="bg-white dark:bg-keto-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                         <h3 className="font-bold text-lg dark:text-white">{r.title}</h3>
-                         <div className="text-xs text-gray-500 uppercase font-bold mb-2">{r.category}</div>
-                         <ul className="text-sm list-disc pl-4 text-gray-600 dark:text-gray-300 mb-4">
+                     <div key={r.id} className="bg-white dark:bg-keto-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow">
+                         <div className="flex justify-between items-start mb-2">
+                             <h3 className="font-bold text-lg dark:text-white leading-tight">{r.title}</h3>
+                             <span className="text-[10px] font-bold uppercase bg-gray-100 dark:bg-white/10 px-2 py-1 rounded text-gray-500">{r.category}</span>
+                         </div>
+                         <div className="text-xs text-gray-400 font-bold mb-3 flex gap-2">
+                             <span className="flex items-center gap-1"><Coffee className="w-3 h-3"/> {r.prepTime}</span>
+                         </div>
+                         <ul className="text-sm list-disc pl-4 text-gray-600 dark:text-gray-300 mb-4 space-y-1">
                              {r.ingredients.slice(0, 3).map((ing, idx) => <li key={idx}>{ing}</li>)}
+                             {r.ingredients.length > 3 && <li className="text-gray-400 text-xs list-none">+ {r.ingredients.length - 3} outros ingredientes</li>}
                          </ul>
-                         <button onClick={() => addToShoppingList(r.ingredients)} className="w-full py-2 bg-gray-50 dark:bg-white/5 text-xs font-bold rounded flex items-center justify-center gap-2"><Plus className="w-3 h-3"/> Add à Lista</button>
+                         <button onClick={() => addToShoppingList(r.ingredients)} className="w-full py-3 bg-gray-50 dark:bg-white/5 hover:bg-keto-light dark:hover:bg-keto-primary/20 text-keto-dark dark:text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-200 dark:border-white/10">
+                            <Plus className="w-4 h-4 text-keto-primary"/> Adicionar à Lista
+                         </button>
                      </div>
                  ))}
              </div>
@@ -637,15 +832,19 @@ const GuideView = () => {
     const [active, setActive] = useState(GUIDE_CONTENT[0].id);
     const content = GUIDE_CONTENT.find(c => c.id === active);
     return (
-        <div className="flex flex-col md:flex-row gap-6 h-full">
-            <div className="w-full md:w-1/3 flex flex-col gap-2">
+        <div className="flex flex-col md:flex-row gap-6 h-full pb-24 lg:pb-10">
+            <div className="w-full md:w-1/3 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
                 {GUIDE_CONTENT.map(c => (
-                    <button key={c.id} onClick={() => setActive(c.id)} className={`p-4 rounded-xl text-left border ${active === c.id ? 'border-keto-primary bg-white dark:bg-keto-dark' : 'border-transparent'}`}>{c.title}</button>
+                    <button key={c.id} onClick={() => setActive(c.id)} className={`p-4 rounded-xl text-left border flex-shrink-0 whitespace-nowrap md:whitespace-normal transition-colors ${active === c.id ? 'border-keto-primary bg-white dark:bg-keto-dark shadow-md' : 'border-transparent text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5'}`}>{c.title}</button>
                 ))}
             </div>
-            <div className="w-full md:w-2/3 bg-white dark:bg-keto-dark p-6 rounded-2xl border border-gray-100 dark:border-white/5 overflow-y-auto">
-                <h2 className="text-2xl font-bold mb-4 dark:text-white">{content?.title}</h2>
-                <div className="prose dark:prose-invert">{content?.content}</div>
+            <div className="w-full md:w-2/3 bg-white dark:bg-keto-dark p-6 rounded-2xl border border-gray-100 dark:border-white/5 overflow-y-auto shadow-sm min-h-[50vh]">
+                <h2 className="text-2xl font-bold mb-4 dark:text-white flex items-center gap-2">
+                    {content?.title}
+                </h2>
+                <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {content?.content}
+                </div>
             </div>
         </div>
     )
@@ -653,24 +852,40 @@ const GuideView = () => {
 
 const TrackerView = ({ dayLogs, addLog, deleteLog, userSettings }: any) => {
     return (
-        <div className="space-y-6">
-            <div className="bg-white dark:bg-keto-dark p-6 rounded-2xl border border-gray-100 dark:border-white/5">
-                <h3 className="font-bold mb-4 dark:text-white">Registrar Dia</h3>
-                <button onClick={() => addLog({id: Date.now().toString(), date: new Date().toISOString(), displayDate: new Date().toLocaleDateString(), energy: 8, weight: userSettings.startingWeight || '75', sleep: '8'})} className="bg-keto-primary text-white px-4 py-2 rounded-lg">Simular Registro (Hoje)</button>
+        <div className="space-y-6 pb-24 lg:pb-10">
+            <div className="bg-white dark:bg-keto-dark p-6 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
+                <h3 className="font-bold mb-4 dark:text-white text-xl">Como você está hoje?</h3>
+                <button onClick={() => addLog({id: Date.now().toString(), date: new Date().toISOString(), displayDate: new Date().toLocaleDateString(), energy: 8, weight: userSettings.startingWeight || '75', sleep: '8'})} className="w-full bg-keto-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-keto-primary/20 hover:bg-keto-accent transition-colors flex items-center justify-center gap-2">
+                    <Plus className="w-5 h-5"/> Registrar Progresso
+                </button>
+                <p className="text-center text-xs text-gray-400 mt-2">Clique para simular um registro rápido</p>
             </div>
+            
             <div className="space-y-4">
-                <SimpleChart data={dayLogs} dataKey="energy" color="#D97706" label="Energia" />
-                <SimpleChart data={dayLogs} dataKey="weight" color="#78716c" label="Peso" />
+                <SimpleChart data={dayLogs} dataKey="energy" color="#D97706" label="Nível de Energia (1-10)" />
+                <SimpleChart data={dayLogs} dataKey="weight" color="#78716c" label="Peso (kg)" />
             </div>
+
             <div className="space-y-2">
-                <h4 className="font-bold text-gray-500 text-sm uppercase">Histórico</h4>
-                {dayLogs.length === 0 && <p className="text-gray-400 text-sm">Nenhum registro ainda.</p>}
+                <h4 className="font-bold text-gray-900 dark:text-white text-lg mt-4">Histórico</h4>
+                {dayLogs.length === 0 && (
+                    <div className="text-center py-8 bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-200 dark:border-white/10">
+                        <History className="w-8 h-8 text-gray-300 mx-auto mb-2"/>
+                        <p className="text-gray-500">Nenhum registro ainda.</p>
+                    </div>
+                )}
                 {dayLogs.map((log: DailyLog) => (
-                    <div key={log.id} className="flex justify-between items-center bg-white dark:bg-keto-dark p-3 rounded-lg border border-gray-100 dark:border-white/5">
-                        <span className="text-sm font-bold dark:text-gray-300">{log.displayDate}</span>
-                        <div className="flex gap-4 text-xs text-gray-500">
-                             <span>⚡ {log.energy}/10</span>
-                             <span>⚖️ {log.weight}kg</span>
+                    <div key={log.id} className="flex justify-between items-center bg-white dark:bg-keto-dark p-4 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gray-100 dark:bg-white/10 p-2 rounded-lg">
+                                <Calendar className="w-4 h-4 text-gray-500"/>
+                            </div>
+                            <span className="text-sm font-bold dark:text-gray-300">{log.displayDate}</span>
+                        </div>
+                        <div className="flex gap-4 text-xs font-bold text-gray-600 dark:text-gray-400">
+                             <span className="flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> {log.energy}/10</span>
+                             <span className="flex items-center gap-1"><Scale className="w-3 h-3 text-stone-500"/> {log.weight}kg</span>
+                             <button onClick={() => deleteLog(log.id)} className="text-red-400 hover:text-red-600 ml-2"><Trash2 className="w-4 h-4"/></button>
                         </div>
                     </div>
                 ))}
@@ -683,7 +898,6 @@ const TrackerView = ({ dayLogs, addLog, deleteLog, userSettings }: any) => {
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>(ViewState.DASHBOARD); 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [toast, setToast] = useState<{message: string, show: boolean}>({message: '', show: false});
   const [showConfetti, setShowConfetti] = useState(false);
   
@@ -845,11 +1059,10 @@ const App: React.FC = () => {
       <Confetti active={showConfetti} />
       <LegalModal isOpen={legalModal.isOpen} onClose={() => setLegalModal({...legalModal, isOpen: false})} type={legalModal.type} />
       
+      <MobileBottomNav currentView={view} setView={setView} />
       <Sidebar 
         currentView={view} 
         setView={setView} 
-        isOpen={isSidebarOpen} 
-        setIsOpen={setIsSidebarOpen}
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
         resetApp={handleResetApp}
@@ -857,19 +1070,14 @@ const App: React.FC = () => {
       />
 
       <main className="flex-1 lg:ml-64 relative flex flex-col min-h-screen">
-        {/* Mobile Header */}
+        {/* Mobile Top Header (Logo Only) */}
         <div className="lg:hidden p-4 bg-white dark:bg-keto-dark shadow-sm flex items-center justify-between sticky top-0 z-30 transition-colors border-b border-gray-100 dark:border-white/5">
           <h1 className="font-serif font-bold text-xl text-keto-dark dark:text-keto-cream flex items-center gap-2">
             <Flame className="w-5 h-5 text-keto-primary"/> Keto 21
           </h1>
-          <div className="flex gap-2">
-            <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg">
+          <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg">
                  {isDarkMode ? <Sun className="w-6 h-6"/> : <Moon className="w-6 h-6"/>}
-            </button>
-            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg">
-                <Menu className="w-6 h-6" />
-            </button>
-          </div>
+          </button>
         </div>
 
         {/* Content Wrapper */}
@@ -879,19 +1087,6 @@ const App: React.FC = () => {
           {view === ViewState.RECIPES && <RecipesView shoppingList={shoppingList} addToShoppingList={addToShoppingList} toggleShoppingItem={toggleShoppingItem} clearShoppingList={clearShoppingList} />}
           {view === ViewState.TRACKER && <TrackerView dayLogs={dayLogs} addLog={handleAddLog} deleteLog={handleDeleteLog} userSettings={settings} />}
         </div>
-
-        <footer className="p-6 bg-white dark:bg-keto-dark border-t border-gray-200 dark:border-white/5 mt-auto transition-colors">
-          <div className="max-w-5xl mx-auto text-xs text-gray-500 dark:text-gray-400">
-             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-                 <p className="font-bold flex items-center gap-1 text-keto-primary"><ShieldAlert className="w-3 h-3"/> AVISO LEGAL:</p>
-                 <div className="flex gap-4">
-                     <button onClick={() => setLegalModal({isOpen: true, type: 'terms'})} className="hover:text-keto-primary underline">Termos de Uso</button>
-                     <button onClick={() => setLegalModal({isOpen: true, type: 'privacy'})} className="hover:text-keto-primary underline">Privacidade</button>
-                 </div>
-             </div>
-             <p className="text-center md:text-left">Este guia é apenas informativo e não substitui orientação médica profissional. Consulte um médico antes de iniciar. Produto comercializado com apoio da Hotmart. A Hotmart não faz controle editorial prévio dos produtos comercializados.</p>
-          </div>
-        </footer>
       </main>
     </div>
   );

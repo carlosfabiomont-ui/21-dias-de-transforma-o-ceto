@@ -55,6 +55,12 @@ export interface DailyGuidance {
   action: string;
   why: string; // The "Science" or reason behind it
   icon: any;
+  mealPlan: {
+    breakfast: string;
+    lunch: string;
+    dinner: string;
+  };
+  exercise: string;
 }
 
 export interface ShoppingItem {
