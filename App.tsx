@@ -554,8 +554,8 @@ const MobileBottomNav = ({ currentView, setView }: { currentView: ViewState, set
 const Sidebar = ({ 
   currentView, 
   setView, 
-  isDarkMode,
-  toggleTheme,
+  isDarkMode, 
+  toggleTheme, 
   resetApp,
   openLegal
 }: { 
@@ -600,7 +600,7 @@ const Sidebar = ({
 
         <div className="px-4 space-y-2 mb-4">
              <button 
-                onClick={() => window.open('mailto:suporte@ketocarnivora.com')}
+                onClick={() => window.open('mailto:contato@ketocarnivoro.com')}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
              >
                 <HelpCircle className="w-5 h-5 text-keto-primary"/>
